@@ -1,0 +1,105 @@
+create database dboMicroservicio;
+
+use dboMicroservicio;
+
+
+create table clients(
+id int primary key,
+nameClient varchar(30),
+email varchar(50),
+phone varchar(20),
+edad int
+);
+
+insert into clients(id, nameClient, email, phone, edad)
+values
+(1, 'Maicol', 'Maicol@gmail.com', '3128797125', 19),
+(2, 'Juan', 'Juan@gmail.com', '312587952', 25),
+(3, 'Camilo', 'Camilo@gmail.com', '310258996', 12),
+(4, 'Diana', 'Diana@gmail.com', '3001125856', 85),
+(5, 'Valentina', 'valentina@gmail.com', '3217894563', 26),
+(6, 'Ximena', 'Xime@gmail.com', '3001225665', 18),
+(7, 'Lina', 'Lina@gmail.com', '3001185252', 27),
+(8, 'Ana', 'Ana@gmail.com', '3128797112', 35),
+(9, 'Isabel', 'Isabel@gmail.com', '3128797178', 42);
+
+CREATE PROCEDURE showclientxid
+   @id int
+AS
+BEGIN
+
+    SELECT *
+    FROM clients
+    WHERE clients.id = @id;
+END;
+
+CREATE PROCEDURE showclients
+AS
+BEGIN
+
+    SELECT *
+    FROM clients;
+END;
+
+
+CREATE PROCEDURE CreateNewClient
+    @id INT,
+    @nameClient VARCHAR(30),
+    @email VARCHAR(50),
+    @phone VARCHAR(20),
+    @edad INT
+AS
+BEGIN
+
+    IF NOT EXISTS (SELECT 1 FROM clients WHERE id = @id)
+    BEGIN
+
+        INSERT INTO clients (id, nameClient, email, phone, edad)
+        VALUES (@id, @nameClient, @email, @phone, @edad);
+    END
+    ELSE
+    BEGIN
+
+        THROW 50000, 'El id proporcionado ya existe en la tabla.', 1;
+    END
+END;
+
+
+CREATE PROCEDURE DeleteClient
+    @id INT
+AS
+BEGIN
+    IF EXISTS (SELECT 1 FROM clients WHERE id = @id)
+    BEGIN
+        DELETE FROM clients WHERE id = @id;
+    END
+    ELSE
+    BEGIN
+        THROW 50000, 'No se encontró un cliente con el ID proporcionado.', 1;
+    END
+END;
+
+
+CREATE PROCEDURE UpdateClient
+    @id INT,
+    @nameClient VARCHAR(30),
+    @email VARCHAR(50),
+    @phone VARCHAR(20),
+    @edad INT
+AS
+BEGIN
+    IF EXISTS (SELECT 1 FROM clients WHERE id = @id)
+    BEGIN
+        UPDATE clients
+        SET nameClient = @nameClient,
+            email = @email,
+            phone = @phone,
+            edad = @edad
+        WHERE id = @id;
+    END
+    ELSE
+    BEGIN
+        THROW 50000, 'No se encontró un cliente con el ID proporcionado.', 1;
+    END
+END;
+
